@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Conda
+.anaconda/
+conda-meta/
+
+# VS Code
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model Files (optional)
+*.pkl
+
+# OS
+.DS_Store
+Thumbs.db

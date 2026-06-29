@@ -1,0 +1,81 @@
+"""
+Train Rainfall Prediction Model
+"""
+
+from pathlib import Path
+import pandas as pd
+import joblib
+
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import (
+    mean_absolute_error,
+    mean_squared_error,
+    r2_score,
+)
+
+print("Loading Dataset...")
+
+df = pd.read_csv("../output/csv/merged_all_days.csv")
+
+print("Dataset Loaded!")
+
+# Features
+X = df[[
+    "Day",
+    "Latitude",
+    "Longitude",
+    "MaxTemp",
+    "MinTemp"
+]]
+
+# Target
+y = df["Rainfall"]
+
+print("\nSplitting Dataset...")
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+
+print("Training Model...")
+
+model = RandomForestRegressor(
+    n_estimators=100,
+    random_state=42,
+    n_jobs=-1
+)
+
+model.fit(X_train, y_train)
+
+print("Training Completed!")
+
+predictions = model.predict(X_test)
+
+print("\nEvaluation")
+
+print("MAE :", mean_absolute_error(y_test, predictions))
+
+print("RMSE :", mean_squared_error(
+    y_test,
+    predictions
+) ** 0.5)
+
+print("R2 Score :", r2_score(
+    y_test,
+    predictions
+))
+
+Path("../models").mkdir(exist_ok=True)
+
+joblib.dump(
+    model,
+    "../models/rainfall_model.pkl"
+)
+
+print("\nModel Saved!")
+
+print("../models/rainfall_model.pkl")
