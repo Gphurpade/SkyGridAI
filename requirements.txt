@@ -1,5 +1,7 @@
 streamlit
-numpy
-pandas
 plotly
+folium
+streamlit-folium
+pandas
+numpy
 joblib
