@@ -7,7 +7,7 @@ import pandas as pd
 import joblib
 
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.metrics import r2_score
 
 print("Loading Dataset...")
@@ -40,10 +40,8 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=42
 )
 
-max_model = RandomForestRegressor(
-    n_estimators=100,
-    random_state=42,
-    n_jobs=-1
+max_model = HistGradientBoostingRegressor(
+    random_state=42
 )
 
 max_model.fit(X_train, y_train)
@@ -67,10 +65,8 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=42
 )
 
-min_model = RandomForestRegressor(
-    n_estimators=100,
-    random_state=42,
-    n_jobs=-1
+min_model = HistGradientBoostingRegressor(
+    random_state=42
 )
 
 min_model.fit(X_train, y_train)
