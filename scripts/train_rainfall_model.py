@@ -14,9 +14,14 @@ from sklearn.metrics import (
     r2_score,
 )
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_PATH = BASE_DIR / "output" / "csv" / "merged_all_days.csv"
+MODEL_DIR = BASE_DIR / "models"
+MODEL_PATH = MODEL_DIR / "rainfall_model.pkl"
+
 print("Loading Dataset...")
 
-df = pd.read_csv("../output/csv/merged_all_days.csv")
+df = pd.read_csv(DATA_PATH)
 
 print("Dataset Loaded!")
 
@@ -69,13 +74,10 @@ print("R2 Score :", r2_score(
     predictions
 ))
 
-Path("../models").mkdir(exist_ok=True)
+MODEL_DIR.mkdir(exist_ok=True)
 
-joblib.dump(
-    model,
-    "../models/rainfall_model.pkl"
-)
+joblib.dump(model, MODEL_PATH)
 
 print("\nModel Saved!")
 
-print("../models/rainfall_model.pkl")
+print(MODEL_PATH)

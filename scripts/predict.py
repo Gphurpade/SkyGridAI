@@ -10,9 +10,34 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-rain_model = joblib.load(BASE_DIR / "models" / "rainfall_model.pkl")
-max_model = joblib.load(BASE_DIR / "models" / "max_temp_model.pkl")
-min_model = joblib.load(BASE_DIR / "models" / "min_temp_model.pkl")
+RAIN_MODEL_PATH = BASE_DIR / "models" / "rainfall_model.pkl"
+MAX_MODEL_PATH = BASE_DIR / "models" / "max_temp_model.pkl"
+MIN_MODEL_PATH = BASE_DIR / "models" / "min_temp_model.pkl"
+
+rain_model = None
+max_model = None
+min_model = None
+
+
+def _load_models():
+    global rain_model, max_model, min_model
+
+    if rain_model is not None and max_model is not None and min_model is not None:
+        return
+
+    missing = [
+        path.name for path in [RAIN_MODEL_PATH, MAX_MODEL_PATH, MIN_MODEL_PATH]
+        if not path.exists()
+    ]
+
+    if missing:
+        raise RuntimeError(
+            "The required trained model files are missing: " + ", ".join(missing)
+        )
+
+    rain_model = joblib.load(RAIN_MODEL_PATH)
+    max_model = joblib.load(MAX_MODEL_PATH)
+    min_model = joblib.load(MIN_MODEL_PATH)
 
 
 def predict_all(day, latitude, longitude, max_temp_input, min_temp_input):
@@ -31,6 +56,8 @@ def predict_all(day, latitude, longitude, max_temp_input, min_temp_input):
     -------
     dict
     """
+
+    _load_models()
 
     rain_features = pd.DataFrame([{
         "Day": day,
