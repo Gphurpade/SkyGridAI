@@ -8,7 +8,7 @@ from huggingface_hub import hf_hub_download
 
 # CONFIGURATION: Replace these with your actual Hugging Face repo details
 # Example: "johndoe/skygrid-models"
-REPO_ID = "your-username/skygrid-models" 
+REPO_ID = "Gayatri00600/skygrid-models" 
 
 @st.cache_resource
 def get_model(filename):
