@@ -1,5 +1,17 @@
-import sys
-from pathlib import Path
+import streamlit as st
+import numpy as np
+import pandas as pd
+import plotly.express as px
+import folium
+from streamlit_folium import st_folium
+
+# Import your existing modules
+import parser as imd_parser
+import predict as imd_predict
+
+st.set_page_config(layout="wide", page_title="SkyGridAI - Digital Twin of India")
+
+# ... rest of your code continues ...
 
 # Ensure the app can find packages from both the workspace venv and the SkyGrid env.
 BASE_DIR = Path(__file__).resolve().parent
