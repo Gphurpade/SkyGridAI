@@ -1,63 +1,38 @@
 """
-predict.py
-
-Reusable prediction module for SkyGridAI.
+predict.py - Optimized for Hugging Face Hub
 """
-
+import streamlit as st
 import joblib
 import pandas as pd
-from pathlib import Path
+from huggingface_hub import hf_hub_download
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+# CONFIGURATION: Replace these with your actual Hugging Face repo details
+REPO_ID = "your-username/skygrid-models" 
 
-RAIN_MODEL_PATH = BASE_DIR / "models" / "rainfall_model.pkl"
-MAX_MODEL_PATH = BASE_DIR / "models" / "max_temp_model.pkl"
-MIN_MODEL_PATH = BASE_DIR / "models" / "min_temp_model.pkl"
-
-rain_model = None
-max_model = None
-min_model = None
-
-
-def _load_models():
-    global rain_model, max_model, min_model
-
-    if rain_model is not None and max_model is not None and min_model is not None:
-        return
-
-    missing = [
-        path.name for path in [RAIN_MODEL_PATH, MAX_MODEL_PATH, MIN_MODEL_PATH]
-        if not path.exists()
-    ]
-
-    if missing:
-        raise RuntimeError(
-            "The required trained model files are missing: " + ", ".join(missing)
-        )
-
-    rain_model = joblib.load(RAIN_MODEL_PATH)
-    max_model = joblib.load(MAX_MODEL_PATH)
-    min_model = joblib.load(MIN_MODEL_PATH)
-
+@st.cache_resource
+def get_model(filename):
+    """
+    Downloads model from Hugging Face Hub and caches it in memory.
+    This avoids local storage issues.
+    """
+    try:
+        model_path = hf_hub_download(repo_id=REPO_ID, filename=filename)
+        return joblib.load(model_path)
+    except Exception as e:
+        st.error(f"Error loading model {filename} from Hub: {e}")
+        return None
 
 def predict_all(day, latitude, longitude, max_temp_input, min_temp_input):
     """
-    Predict rainfall, maximum temperature and minimum temperature.
-
-    Parameters
-    ----------
-    day : int
-    latitude : float
-    longitude : float
-    max_temp_input : float
-    min_temp_input : float
-
-    Returns
-    -------
-    dict
+    Predicts weather metrics using models fetched from Hugging Face.
     """
+    # Models are automatically cached in memory by Streamlit
+    rain_model = get_model("rainfall_model.joblib")
+    max_model = get_model("max_temp_model.joblib")
+    min_model = get_model("min_temp_model.joblib")
 
-    _load_models()
+    if None in [rain_model, max_model, min_model]:
+        return {"rainfall": 0.0, "max_temperature": 0.0, "min_temperature": 0.0}
 
     rain_features = pd.DataFrame([{
         "Day": day,
@@ -84,28 +59,3 @@ def predict_all(day, latitude, longitude, max_temp_input, min_temp_input):
         "max_temperature": float(predicted_max),
         "min_temperature": float(predicted_min)
     }
-
-
-if __name__ == "__main__":
-
-    print("SkyGridAI Prediction Module\n")
-
-    day = int(input("Day (1-365): "))
-    latitude = float(input("Latitude: "))
-    longitude = float(input("Longitude: "))
-    max_temp = float(input("Maximum Temperature (°C): "))
-    min_temp = float(input("Minimum Temperature (°C): "))
-
-    result = predict_all(
-        day,
-        latitude,
-        longitude,
-        max_temp,
-        min_temp
-    )
-
-    print("\nPrediction Result")
-    print("-----------------------------")
-    print(f"Rainfall : {result['rainfall']:.2f} mm")
-    print(f"Max Temp : {result['max_temperature']:.2f} °C")
-    print(f"Min Temp : {result['min_temperature']:.2f} °C")
