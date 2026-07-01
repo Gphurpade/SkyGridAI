@@ -11,43 +11,6 @@ import predict as imd_predict
 
 st.set_page_config(layout="wide", page_title="SkyGridAI - Digital Twin of India")
 
-# ... rest of your code continues ...
-
-# Ensure the app can find packages from both the workspace venv and the SkyGrid env.
-BASE_DIR = Path(__file__).resolve().parent
-site_packages_candidates = [
-    BASE_DIR / ".venv" / "Lib" / "site-packages",
-    BASE_DIR / ".venv" / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}" / "site-packages",
-    BASE_DIR / "skygrid" / "Lib" / "site-packages",
-    BASE_DIR / "skygrid" / "lib" / f"python{sys.version_info.major}.{sys.version_info.minor}" / "site-packages",
-]
-module_search_paths = [BASE_DIR / "scripts"]
-
-for package_path in site_packages_candidates:
-    if package_path.exists():
-        sys.path.insert(0, str(package_path))
-
-for module_path in module_search_paths:
-    if module_path.exists():
-        sys.path.insert(0, str(module_path))
-
-# ==========================================================
-# Original Imports Continue Below
-# ==========================================================
-
-import streamlit as st
-import numpy as np
-import pandas as pd
-import plotly.express as px
-import folium
-from streamlit_folium import st_folium
-
-# Import your existing modules
-import parser as imd_parser
-import predict as imd_predict
-
-st.set_page_config(layout="wide", page_title="SkyGridAI - Digital Twin of India")
-
 st.title(" SkyGridAI")
 st.markdown("Get insights into India's weather patterns with our interactive map visualizer and predictive simulator. Explore historical data or simulate future scenarios based on your inputs.")
 
@@ -284,4 +247,8 @@ else:
         st.plotly_chart(fig_compare, use_container_width=True)
         
     except Exception as e:
-        st.info(f" Please ensure your trained `.pkl` models exist within the `../models/` directory to utilize this predictive playground. Context: {e}")
+        st.error("⚠️ Predictive models unavailable.")
+        st.info("Models are hosted externally on Hugging Face Hub. "
+                "Ensure your `predict.py` is configured with the correct `REPO_ID` and "
+                "your Hugging Face model repository is public.")
+        st.write(f"Technical Context: {e}")
